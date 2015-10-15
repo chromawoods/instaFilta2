@@ -101,6 +101,8 @@
         /* Wraps a span around the matching part of the target's text. */
         markMatches: false,
 
+        onFilterComplete: null,
+
         /* A section will become unmatched when there are no matching targets left. */
         hideEmptySections: true,
 
@@ -418,6 +420,14 @@
 
       /* Handle sections. */
       handleSections();
+
+      if (typeof settings.onFilterComplete === 'function') {
+        settings.onFilterComplete.apply(this, [(function(ts) {
+          var m = [];
+          $.each(ts, function(i, t) { t.isMatching && m.push(t); });
+          return m;
+        })(_instance.targets)]);
+      }
 
     };
 
