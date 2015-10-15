@@ -27,7 +27,7 @@
     var settings = $.extend({
 
         /* Outputs log messages in the JS console. */
-        enableLogging: true,
+        enableLogging: false,
 
         /* Selector to use for trigger elements. */
         triggers: '.instafilta-trigger',
@@ -65,6 +65,11 @@
         /* Whether to use synonyms or not. */
         useSynonyms: true,
 
+        /* Runs the filtering process one initial time just after setting up. */
+        filterOnLoad: true,
+
+        /* It can be wise to have a delay when using a text field on a huge list,
+        to allow for keystrokes to be collected. */
         triggerDelay: 0,
 
         /* Set to true to only match terms from the beginning of targets. */
@@ -540,6 +545,7 @@
 
       prepareTargets(_$master.find(settings.targets));
       prepareSections(_$master.find(settings.sections));
+      settings.filterOnLoad && tartFiltering();
 
 
       /* Returns methods to be used from the outside. */
