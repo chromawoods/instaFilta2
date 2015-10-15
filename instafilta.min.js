@@ -1,5 +1,5 @@
 /*!
- * instaFilta2 - version: 2.0.0
+ * instaFilta2 - version: 2.0.2
  * jQuery plugin for performing fast customized in-page filtering
  * Documentation: https://github.com/chromawoods/instaFilta
  * Author: Andreas Weber <andreas@chromawoods.com> (http://chromawoods.com)
