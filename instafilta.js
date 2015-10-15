@@ -545,7 +545,7 @@
 
       prepareTargets(_$master.find(settings.targets));
       prepareSections(_$master.find(settings.sections));
-      settings.filterOnLoad && tartFiltering();
+      settings.filterOnLoad && startFiltering();
 
 
       /* Returns methods to be used from the outside. */
