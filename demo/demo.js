@@ -28,4 +28,6 @@ $(function() {
     }
   });
 
+  $('#ex8').instaFilta();
+
 });
