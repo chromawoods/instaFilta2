@@ -1,5 +1,5 @@
 /*!
- * instaFilta2 - version: 2.0.2
+ * instaFilta2 - version: 2.0.3
  * jQuery plugin for performing fast customized in-page filtering
  * Documentation: https://github.com/chromawoods/instaFilta
  * Author: Andreas Weber <andreas@chromawoods.com> (http://chromawoods.com)
@@ -114,13 +114,22 @@
           {
             'selector': '[type=text]',
             'events': 'keyup',
-            'type': 'term'
+            'type': 'term',
+            'termSrc': 'value'
           },
           {
             'selector': CONST.checkables,
             'events': 'change',
             'type': 'category',
+            'termSrc': 'value',
             'groupBy': 'name',
+            'noneMatchesAll': true
+          },
+          {
+            'selector': 'select',
+            'events': 'change',
+            'type': 'category',
+            'termSrc': 'value',
             'noneMatchesAll': true
           }
         ]
@@ -333,7 +342,7 @@
       }
 
       /* Initiator uses a string term. */
-      else if (typeof initiator.term === 'string') {
+      else if (initiator.behavior.type === 'term' && initiator.active) {
         return isTermMatch();
       }
 
@@ -438,6 +447,26 @@
 
       if (!$elem.length) { return false; }
 
+      var setInitiatorState = function(initiator) {
+
+        var activeTriggers = 0, activeState = true;
+
+        $.each(initiator.triggers, function(i, t) {
+          if (t.$el.val()) {
+            t.active = true;
+            activeTriggers++;
+          }
+          else { t.active = false; }
+          initiator.term = t.$el.val();
+        });
+
+        if (activeTriggers === 0 && initiator.behavior.noneMatchesAll) {
+          initiator.active = false;
+        }
+        else { initiator.active = true; }
+
+      };
+
       var createGroup = function(initiator) {
 
         var group = [];
@@ -446,45 +475,43 @@
 
           var triggerTimer = null;
 
-          var categories = $e.data(settings.categoryDataAttr) ? $e.data(settings.categoryDataAttr).split(',') : false;
+          var getCurrentCategories = function(termSrc) {
+
+            var categories = false;
+
+            if (typeof termSrc === 'function') {
+              categories = termSrc.apply(null, [$e, initiator]);
+            }
+            else if (termSrc === 'value' && $e.val()) {
+              categories = [$e.val()];
+            }
+            else if ($e.data(settings.categoryDataAttr)) {
+              categories = $e.data(settings.categoryDataAttr).split(',');
+            }
+
+            return categories;
+          };
 
           var trigger = {
             $el: $e.data('if-initiator', true),
-            categories: categories,
+            categories: behavior.type === 'category' ? getCurrentCategories(initiator.behavior.termSrc) : false,
             active: false
           };
 
           /* The trigger was triggered! */
           trigger.$el.on(behavior.events, function() {
 
-            var term = null, $triggered = $(this), activeTriggers = 0;
+            var term = null, $triggered = $(this);
 
             log('Initiator triggered', behavior);
 
             clearTimeout(triggerTimer);
 
-            /* Handle text fields. */
-            if (behavior.type === 'term') {
-              initiator.term = $elem.val();
+            if (behavior.type === 'category') {
+              trigger.categories = getCurrentCategories(initiator.behavior.termSrc);
             }
 
-            /* Handle radio buttons and checkboxes. */
-            $.each(initiator.triggers, function(i, t) {
-              if (t.$el.is(CONST.checkables) && t.$el.is(':checked')) {
-                t.active = true;
-                activeTriggers++;
-              }
-              else {
-                t.active = false;
-              }
-            });
-
-            /* If all are unchecked, then match everything if noneMatchesAll. */
-            if (activeTriggers === 0 && initiator.behavior.noneMatchesAll) {
-              initiator.active = false;
-            }
-            else { initiator.active = true; }
-
+            setInitiatorState(initiator);
             triggerTimer = setTimeout(startFiltering, settings.triggerDelay);
           });
 
@@ -514,6 +541,7 @@
       }
 
       initiator.triggers = createGroup(initiator);
+      settings.filterOnLoad && setInitiatorState(initiator);
       _instance.initiators.push(initiator);
 
       log('Done adding initiator', initiator);
