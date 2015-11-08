@@ -1,7 +1,7 @@
 {
   "name": "instaFilta2",
   "description": "jQuery plugin for performing fast customized in-page filtering",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "homepage": "https://github.com/chromawoods/instaFilta2",
   "author": "Andreas Weber <andreas@chromawoods.com> (http://chromawoods.com)",
   "devDependencies": {

@@ -1,5 +1,5 @@
 /*!
- * instaFilta2 - version: 2.0.3
+ * instaFilta2 - version: 2.0.4
  * jQuery plugin for performing fast customized in-page filtering
  * Documentation: https://github.com/chromawoods/instaFilta
  * Author: Andreas Weber <andreas@chromawoods.com> (http://chromawoods.com)
@@ -167,7 +167,7 @@
       if (settings.useSynonyms) {
         $.each(settings.synonyms, function(i, synonym) {
           $.each(synonym.src, function(i, srcChar) {
-            term = term.replace(srcChar, synonym.dst);
+            term = term.replace(new RegExp(srcChar, "g"), synonym.dst);
           });
         });
       }
